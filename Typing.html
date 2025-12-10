@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Typing Trainer</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f8ff;
+      text-align: center;
+      padding: 40px;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    select, input, button {
+      font-size: 1.2em;
+      margin: 10px;
+      padding: 10px;
+    }
+
+    #char {
+      font-size: 3em;
+      color: #007acc;
+      margin: 20px;
+    }
+
+    #score, #timer {
+      font-size: 1.2em;
+      margin: 10px;
+    }
+
+    #start {
+      background-color: #007acc;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #start:hover {
+      background-color: #005f99;
+    }
+  </style>
+</head>
+<body>
+  <h1>⌨️ Typing Trainer</h1>
+  <label for="level">Choose Level:</label>
+  <select id="level">
+    <option value="1">Level 1: Home Row</option>
+    <option value="2">Level 2: Top Row</option>
+    <option value="3">Level 3: Bottom Row</option>
+    <option value="4">Level 4: Numbers</option>
+    <option value="5">Level 5: Punctuation</option>
+    <option value="6">Level 6: Words</option>
+  </select>
+  <div id="char">Press Start</div>
+  <input type="text" id="input" maxlength="20" disabled />
+  <div id="score">Score: 0</div>
+  <div id="timer">Time: 30s</div>
+  <button id="start">Start Level</button>
+
+  <script>
+    const levels = {
+      1: ["a", "s", "d", "f", "j", "k", "l", ";"],
+      2: ["q", "w", "e", "r", "u", "i", "o", "p"],
+      3: ["z", "x", "c", "v", "b", "n", "m"],
+      4: ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
+      5: [".", ",", "!", "?", "'", "\"", "-", ":"],
+      6: ["cat", "dog", "run", "jump", "hello", "world", "type", "fast"]
+    };
+
+    let score = 0;
+    let time = 30;
+    let currentChar = "";
+    let timerInterval;
+    let currentLevel = 1;
+
+    const charDisplay = document.getElementById("char");
+    const input = document.getElementById("input");
+    const scoreDisplay = document.getElementById("score");
+    const timerDisplay = document.getElementById("timer");
+    const startButton = document.getElementById("start");
+    const levelSelect = document.getElementById("level");
+
+    function showNewChar() {
+      const chars = levels[currentLevel];
+      currentChar = chars[Math.floor(Math.random() * chars.length)];
+      charDisplay.textContent = currentChar;
+      input.value = "";
+      input.focus();
+    }
+
+    function startGame() {
+      score = 0;
+      time = 30;
+      currentLevel = parseInt(levelSelect.value);
+      input.disabled = false;
+      scoreDisplay.textContent = "Score: 0";
+      timerDisplay.textContent = "Time: 30s";
+      showNewChar();
+
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        time--;
+        timerDisplay.textContent = `Time: ${time}s`;
+        if (time <= 0) {
+          clearInterval(timerInterval);
+          input.disabled = true;
+          charDisplay.textContent = "Level Complete!";
+        }
+      }, 1000);
+    }
+
+    input.addEventListener("input", () => {
+      if (input.value.trim().toLowerCase() === currentChar) {
+        score++;
+        scoreDisplay.textContent = "Score: " + score;
+        showNewChar();
+      } else {
+        input.value = "";
+      }
+    });
+
+    startButton.addEventListener("click", startGame);
+  </script>
+</body>
+</html>

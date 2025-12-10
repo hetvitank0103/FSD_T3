@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fruit Slice Game</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: sans-serif;
+      background: linear-gradient(to top, #fceabb, #f8b500);
+    }
+
+    #scoreboard {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 1.5em;
+      color: #333;
+      background: rgba(255,255,255,0.8);
+      padding: 10px 20px;
+      border-radius: 10px;
+      z-index: 10;
+    }
+
+    .fruit {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      font-size: 2.5em;
+      text-align: center;
+      line-height: 60px;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.2s;
+    }
+
+    .fruit:active {
+      transform: scale(0.8);
+    }
+  </style>
+</head>
+<body>
+  <div id="scoreboard">Score: 0 | Missed: 0</div>
+
+  <script>
+    const fruits = ['🍎','🍌','🍇','🍉','🍓','🍍','🥝','🍒'];
+    let score = 0;
+    let missed = 0;
+
+    function updateScoreboard() {
+      document.getElementById('scoreboard').textContent = `Score: ${score} | Missed: ${missed}`;
+    }
+
+    function createFruit() {
+      const fruit = document.createElement('div');
+      fruit.classList.add('fruit');
+      fruit.textContent = fruits[Math.floor(Math.random() * fruits.length)];
+
+      const startX = Math.random() * (window.innerWidth - 60);
+      fruit.style.left = `${startX}px`;
+      fruit.style.top = `100px`; // hang time position
+      document.body.appendChild(fruit);
+
+      let y = 100;
+      const fallSpeed = 2 + Math.random() * 3;
+
+      // Wait 1 second before falling
+      setTimeout(() => {
+        const fallInterval = setInterval(() => {
+          y += fallSpeed;
+          fruit.style.top = `${y}px`;
+
+          if (y > window.innerHeight) {
+            clearInterval(fallInterval);
+            fruit.remove();
+            missed++;
+            updateScoreboard();
+            if (missed >= 3) {
+              alert(`💥 Game Over!\nFinal Score: ${score}`);
+              score = 0;
+              missed = 0;
+              updateScoreboard();
+            }
+          }
+        }, 20);
+
+        fruit.addEventListener('click', () => {
+          clearInterval(fallInterval);
+          fruit.remove();
+          score++;
+          updateScoreboard();
+        });
+      }, 1000); // 1 second hang time
+    }
+
+    // Drop a new fruit every 1.2 seconds
+    setInterval(createFruit, 1200);
+  </script>
+</body>
+</html>

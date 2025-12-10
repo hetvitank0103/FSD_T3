@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>carousel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  </head>
+  <body style="background-color:blanchedalmond">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <div id="mytest" class="carousel slide" data-bs-ride="carousel" data-bs-pause="hover">
+        <div class="carousel-indicators">
+            <button data-bs-slide-to="0" data-bs-target="#mytest" class="active"></button>
+            <button data-bs-slide-to="1" data-bs-target="#mytest"></button>
+            <button data-bs-slide-to="2" data-bs-target="#mytest"></button>
+        </div>
+        <div class="carousel-inner">
+            <div class="carousel-item active" data-bs-interval="2000">
+                <img src="img5.jfif" class="d-block w-100" alt="img3" style="height: 400px;">
+                <div class="carousel-caption bg-dark mx-auto w-225">
+                    <h5>Slide1</h5>
+                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque quidem harum incidunt natus accusamus! Voluptas accusamus aperiam, sunt quos corporis omnis perspiciatis quisquam? In error minus sed dolore natus quae?
+                    Reiciendis id iusto excepturi explicabo quaerat eius quam, nemo quos vel eos neque nobis obcaecati atque! Quidem nulla voluptate, sit, sint accusantium consequatur ipsam assumenda, id nostrum tenetur eligendi. Veritatis.</p>
+                    <a href="#" class="btn btn-danger">View</a>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img src="img4.jfif" class="d-block w-100" style="height: 400px;">
+                <div class="carousel-caption bg-dark p-2 w-25">
+                    <h5>Slide2</h5>
+                    <a href="#" class="btn btn-danger">View</a>
+                </div>
+            </div>
+        </div>
+        <button class="carousel-control-prev" data-bs-target="#mytest" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" data-bs-target="#mytest" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+        </button>
+    </div>
+</body>
+</html>

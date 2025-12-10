@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dino Jump Game</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #f4f4f4;
+      font-family: sans-serif;
+    }
+
+    #game {
+      position: relative;
+      width: 100%;
+      height: 300px;
+      background: #fff;
+      border-bottom: 4px solid #333;
+    }
+
+    #dino {
+      position: absolute;
+      bottom: 0;
+      left: 50px;
+      width: 50px;
+      height: 50px;
+      background: #007acc;
+      border-radius: 5px;
+    }
+
+    #cactus {
+      position: absolute;
+      bottom: 0;
+      right: -60px;
+      width: 30px;
+      height: 50px;
+      background: #228B22;
+    }
+
+    #score {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 1.2em;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <div id="dino"></div>
+    <div id="cactus"></div>
+    <div id="score">Score: 0</div>
+  </div>
+
+  <script>
+    const dino = document.getElementById("dino");
+    const cactus = document.getElementById("cactus");
+    const scoreDisplay = document.getElementById("score");
+
+    let isJumping = false;
+    let score = 0;
+    let cactusSpeed = 5;
+
+    function jump() {
+      if (isJumping) return;
+      isJumping = true;
+      let position = 0;
+      const upInterval = setInterval(() => {
+        if (position >= 100) {
+          clearInterval(upInterval);
+          const downInterval = setInterval(() => {
+            if (position <= 0) {
+              clearInterval(downInterval);
+              isJumping = false;
+            } else {
+              position -= 5;
+              dino.style.bottom = position + "px";
+            }
+          }, 20);
+        } else {
+          position += 5;
+          dino.style.bottom = position + "px";
+        }
+      }, 20);
+    }
+
+    function moveCactus() {
+      let cactusPosition = window.innerWidth;
+      cactus.style.left = cactusPosition + "px";
+
+      const moveInterval = setInterval(() => {
+        cactusPosition -= cactusSpeed;
+        cactus.style.left = cactusPosition + "px";
+
+        const dinoBottom = parseInt(window.getComputedStyle(dino).bottom);
+        if (
+          cactusPosition > 50 && cactusPosition < 80 &&
+          dinoBottom < 50
+        ) {
+          clearInterval(moveInterval);
+          alert("💥 Game Over! Final Score: " + score);
+          score = 0;
+          cactusSpeed = 5;
+          scoreDisplay.textContent = "Score: 0";
+          moveCactus();
+        }
+
+        if (cactusPosition < -30) {
+          clearInterval(moveInterval);
+          score++;
+          cactusSpeed += 0.2;
+          scoreDisplay.textContent = "Score: " + score;
+          setTimeout(moveCactus, 1000);
+        }
+      }, 20);
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.code === "Space") jump();
+    });
+
+    moveCactus();
+  </script>
+</body>
+</html>

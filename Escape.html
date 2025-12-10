@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Maze Escape Levels</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f0f0;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    #maze {
+      display: grid;
+      grid-template-columns: repeat(10, 40px);
+      grid-template-rows: repeat(10, 40px);
+      gap: 2px;
+      margin: 20px auto;
+      width: fit-content;
+    }
+
+    .cell {
+      width: 40px;
+      height: 40px;
+      background-color: #ddd;
+    }
+
+    .wall {
+      background-color: #000;
+    }
+
+    .player {
+      background-color: #007acc;
+    }
+
+    .goal {
+      background-color: #28a745;
+    }
+
+    #level {
+      font-size: 1.2em;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧩 Maze Escape</h1>
+  <p>Use arrow keys to reach the green goal. Avoid black walls!</p>
+  <div id="level">Level: 1</div>
+  <div id="maze"></div>
+
+  <script>
+    const levels = [
+      [
+        "##########",
+        "#        #",
+        "# ###### #",
+        "# #    # #",
+        "# # ## # #",
+        "# # ## # #",
+        "# #    # #",
+        "# ###### #",
+        "#        #",
+        "########G#"
+      ],
+      [
+        "##########",
+        "#     #  #",
+        "# ### # ##",
+        "# #     G#",
+        "# # ######",
+        "# #      #",
+        "# ###### #",
+        "#        #",
+        "## #######",
+        "#         "
+      ],
+      [
+        "##########",
+        "#        #",
+        "# ###### #",
+        "# #    # #",
+        "# # ## # #",
+        "# # ## # #",
+        "# # ## # #",
+        "# #    #G#",
+        "# ###### #",
+        "#        #"
+      ]
+    ];
+
+    let currentLevel = 0;
+    let playerX = 1;
+    let playerY = 1;
+
+    const maze = document.getElementById("maze");
+    const levelDisplay = document.getElementById("level");
+
+    function drawMaze() {
+      maze.innerHTML = "";
+      const layout = levels[currentLevel];
+      for (let y = 0; y < 10; y++) {
+        for (let x = 0; x < 10; x++) {
+          const cell = document.createElement("div");
+          cell.classList.add("cell");
+          const char = layout[y][x];
+          if (char === "#") cell.classList.add("wall");
+          if (char === "G") cell.classList.add("goal");
+          if (x === playerX && y === playerY) cell.classList.add("player");
+          maze.appendChild(cell);
+        }
+      }
+      levelDisplay.textContent = `Level: ${currentLevel + 1}`;
+    }
+
+    function movePlayer(dx, dy) {
+      const layout = levels[currentLevel];
+      const newX = playerX + dx;
+      const newY = playerY + dy;
+      if (!layout[newY] || !layout[newY][newX]) return;
+
+      const target = layout[newY][newX];
+      if (target === "#") {
+        alert("💥 You hit a wall! Try again.");
+        resetLevel();
+        return;
+      }
+
+      playerX = newX;
+      playerY = newY;
+      drawMaze();
+
+      if (target === "G") {
+        setTimeout(() => {
+          alert("🎉 Level Complete!");
+          nextLevel();
+        }, 100);
+      }
+    }
+
+    function resetLevel() {
+      playerX = 1;
+      playerY = 1;
+      drawMaze();
+    }
+
+    function nextLevel() {
+      currentLevel++;
+      if (currentLevel >= levels.length) {
+        alert("🏆 You completed all levels!");
+        currentLevel = 0;
+      }
+      resetLevel();
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowUp") movePlayer(0, -1);
+      if (e.key === "ArrowDown") movePlayer(0, 1);
+      if (e.key === "ArrowLeft") movePlayer(-1, 0);
+      if (e.key === "ArrowRight") movePlayer(1, 0);
+    });
+
+    drawMaze();
+  </script>
+</body>
+</html>

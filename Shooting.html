@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Space Blaster</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: black;
+      font-family: monospace;
+    }
+
+    canvas {
+      display: block;
+      margin: 0 auto;
+      background: #000;
+    }
+
+    #score {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: white;
+      font-size: 1.5em;
+    }
+
+    #gameOver {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 2em;
+      text-align: center;
+      display: none;
+    }
+
+    #restartBtn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1em;
+      background-color: #007acc;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    #restartBtn:hover {
+      background-color: #005f99;
+    }
+  </style>
+</head>
+<body>
+  <div id="score">Score: 0</div>
+  <div id="gameOver">
+    💥 Game Over!<br>
+    <button id="restartBtn">Restart</button>
+  </div>
+  <canvas id="gameCanvas" width="800" height="500"></canvas>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    const scoreDisplay = document.getElementById("score");
+    const gameOverScreen = document.getElementById("gameOver");
+    const restartBtn = document.getElementById("restartBtn");
+
+    let spaceship, bullets, asteroids, score, gameRunning;
+    let asteroidSpeed = 1.2; // slower speed
+
+    function initGame() {
+      spaceship = { x: 400, y: 450, width: 40, height: 20 };
+      bullets = [];
+      asteroids = [];
+      score = 0;
+      gameRunning = true;
+      scoreDisplay.textContent = "Score: 0";
+      gameOverScreen.style.display = "none";
+    }
+
+    function drawShip() {
+      ctx.fillStyle = "#0ff";
+      ctx.fillRect(spaceship.x, spaceship.y, spaceship.width, spaceship.height);
+    }
+
+    function drawBullets() {
+      ctx.fillStyle = "yellow";
+      bullets.forEach(b => ctx.fillRect(b.x, b.y, 4, 10));
+    }
+
+    function drawAsteroids() {
+      ctx.fillStyle = "red";
+      asteroids.forEach(a => {
+        ctx.beginPath();
+        ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+
+    function update() {
+      if (!gameRunning) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawShip();
+
+      bullets.forEach((b, i) => {
+        b.y -= 5;
+        if (b.y < 0) bullets.splice(i, 1);
+      });
+
+      asteroids.forEach((a, i) => {
+        a.y += asteroidSpeed;
+        if (a.y > canvas.height) {
+          endGame();
+        }
+
+        bullets.forEach((b, j) => {
+          const dx = a.x - b.x;
+          const dy = a.y - b.y;
+          if (Math.sqrt(dx * dx + dy * dy) < a.r) {
+            asteroids.splice(i, 1);
+            bullets.splice(j, 1);
+            score++;
+            scoreDisplay.textContent = "Score: " + score;
+          }
+        });
+      });
+
+      drawBullets();
+      drawAsteroids();
+    }
+
+    function spawnAsteroid() {
+      if (!gameRunning) return;
+      const x = Math.random() * canvas.width;
+      const r = 15 + Math.random() * 15;
+      asteroids.push({ x, y: -r, r });
+    }
+
+    function endGame() {
+      gameRunning = false;
+      gameOverScreen.style.display = "block";
+    }
+
+    restartBtn.addEventListener("click", () => {
+      initGame();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (!gameRunning) return;
+      if (e.key === "ArrowLeft" && spaceship.x > 0) spaceship.x -= 20;
+      if (e.key === "ArrowRight" && spaceship.x < canvas.width - spaceship.width) spaceship.x += 20;
+      if (e.key === " " || e.key === "ArrowUp") {
+        bullets.push({ x: spaceship.x + spaceship.width / 2, y: spaceship.y });
+      }
+    });
+
+    initGame();
+    setInterval(update, 30);
+    setInterval(spawnAsteroid, 1000);
+  </script>
+</body>
+</html>
