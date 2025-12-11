@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Emoji Fun</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      transition: background 0.5s;
+    }
+    #emoji {
+      font-size: 5rem;
+      margin-top: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Click for Fun!</h1>
+  <button onclick="makeFun()">Surprise Me</button>
+  <div id="emoji">😎</div>
+
+  <script>
+    const emojis = ["😂","🤯","🦄","🐸","🍕","🚀","👻","🐱","🌈","🥳"];
+    function makeFun() {
+      const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+      document.getElementById("emoji").textContent = randomEmoji;
+      document.body.style.background = `hsl(${Math.random()*360}, 70%, 80%)`;
+    }
+  </script>
+</body>
+</html>

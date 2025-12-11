@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nova — Modern Web</title>
+  <style>
+    :root{
+      --bg:#0b1020; --panel:#0e152a; --text:#e6edf7; --muted:#a9b4c9;
+      --primary:#7c9cff; --accent:#55e6a5; --border:#1f2a44;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    a{color:inherit;text-decoration:none}
+    img{max-width:100%;display:block}
+    .container{max-width:1100px;margin:0 auto;padding:0 20px}
+
+    /* Header / Nav */
+    header{
+      position:sticky; top:0; z-index:1000;
+      backdrop-filter:saturate(120%) blur(8px);
+      background:linear-gradient(180deg, rgba(12,19,40,0.85), rgba(12,19,40,0.65));
+      border-bottom:1px solid var(--border);
+    }
+    .nav{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 0;
+    }
+    .brand{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:0.4px}
+    .brand .logo{
+      width:30px; height:30px; border-radius:8px; display:grid; place-items:center;
+      background:linear-gradient(135deg, var(--primary), var(--accent)); color:#081327; font-weight:900;
+    }
+    .links{display:flex; gap:18px}
+    .links a{opacity:0.85; padding:8px 10px; border-radius:10px}
+    .links a:hover{opacity:1; background:#0f1933}
+    .cta{padding:8px 14px; border-radius:12px; font-weight:700; background:linear-gradient(135deg, var(--primary), var(--accent)); color:#081327; border:none}
+
+    /* Hero */
+    .hero{
+      position:relative;
+      padding:70px 0 40px;
+      background:
+        radial-gradient(800px 300px at 15% -10%, rgba(124,156,255,0.15), transparent 60%),
+        radial-gradient(900px 350px at 85% -20%, rgba(85,230,165,0.14), transparent 60%);
+    }
+    .hero-inner{display:grid; grid-template-columns:1.15fr 0.85fr; gap:30px; align-items:center}
+    .hero h1{font-size:clamp(32px, 4.5vw, 54px); line-height:1.06; margin:0 0 12px}
+    .hero p{color:var(--muted); font-size:clamp(16px, 1.6vw, 18px); margin:0 0 22px}
+    .hero-actions{display:flex; gap:12px; flex-wrap:wrap}
+    .btn{
+      background:#111a33; border:1px solid var(--border); color:var(--text);
+      padding:10px 14px; border-radius:12px; cursor:pointer; transition:transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+    }
+    .btn:hover{transform:translateY(-1px); box-shadow:0 10px 30px rgba(0,0,0,0.35); border-color:#2a3a60}
+    .btn.primary{background:linear-gradient(135deg, var(--primary), var(--accent)); color:#061423; border:none; font-weight:800}
+    .card{
+      background:linear-gradient(180deg, var(--panel), #0b1329);
+      border:1px solid var(--border); border-radius:16px; padding:16px; box-shadow:inset 0 0 0 1px #0c1430;
+    }
+
+    /* Features */
+    .section{padding:60px 0}
+    .section h2{font-size:28px; margin:0 0 8px}
+    .section p.lead{color:var(--muted); margin:0 0 22px}
+    .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:18px}
+    .feature .icon{
+      width:44px; height:44px; border-radius:12px; display:grid; place-items:center; font-weight:900;
+      background:#111a33; border:1px solid var(--border);
+    }
+    .feature h3{margin:10px 0 6px; font-size:18px}
+    .feature p{color:var(--muted); margin:0}
+
+    /* Showcase */
+    .showcase{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+    .panel{
+      border-radius:16px; overflow:hidden; border:1px solid var(--border);
+      background:linear-gradient(180deg, #0f1833, #0b1326);
+    }
+    .panel .head{padding:12px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between}
+    .panel .body{padding:16px}
+    .pill{padding:6px 10px; border:1px solid var(--border); border-radius:999px; color:var(--muted); font-size:12px}
+
+    /* Pricing */
+    .pricing{display:grid; grid-template-columns:repeat(3,1fr); gap:18px}
+    .price-card .title{font-weight:800; letter-spacing:0.4px}
+    .price{font-size:26px; margin:8px 0}
+    .list{display:grid; gap:8px; margin:10px 0 16px}
+    .list .item{display:flex; gap:10px; align-items:center; color:var(--muted)}
+    .list .tick{color:var(--accent)}
+    .price-card .btn{width:100%}
+
+    /* Contact */
+    .contact-grid{display:grid; grid-template-columns:1.2fr 0.8fr; gap:18px}
+    input, textarea{
+      width:100%; background:#0e1630; color:var(--text);
+      border:1px solid var(--border); border-radius:12px; padding:10px 12px; resize:vertical;
+    }
+    label{display:block; margin:10px 0 6px; color:var(--muted)}
+    .small{font-size:12px; color:var(--muted)}
+
+    /* Footer */
+    footer{padding:28px 0; border-top:1px solid var(--border); color:var(--muted); text-align:center}
+
+    /* Responsive */
+    @media (max-width: 960px){
+      .hero-inner{grid-template-columns:1fr; text-align:center}
+      .showcase{grid-template-columns:1fr}
+      .grid-3{grid-template-columns:1fr 1fr}
+      .pricing{grid-template-columns:1fr 1fr}
+      .contact-grid{grid-template-columns:1fr}
+      .hero-actions{justify-content:center}
+    }
+    @media (max-width: 640px){
+      .grid-3, .pricing{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="container nav">
+      <div class="brand">
+        <div class="logo">N</div>
+        <div>Nova</div>
+      </div>
+      <nav class="links">
+        <a href="#home">Home</a>
+        <a href="#features">Features</a>
+        <a href="#showcase">Showcase</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <button class="cta" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Get started</button>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section id="home" class="hero">
+    <div class="container hero-inner">
+      <div>
+        <h1>Build beautiful, fast websites with zero fuss.</h1>
+        <p>Nova is a clean, responsive starter that gives you modern UI, smart layout, and instant polish — perfect for landing pages and simple sites.</p>
+        <div class="hero-actions">
+          <button class="btn primary" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">See pricing</button>
+          <button class="btn" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">Explore features</button>
+        </div>
+      </div>
+      <div class="card">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+          <div class="pill">Live preview</div>
+          <div class="pill">Responsive</div>
+        </div>
+        <img alt="Preview" src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1200&auto=format&fit=crop" />
+        <p class="small" style="margin-top:8px;">Mock preview image for demo purposes.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="features" class="section">
+    <div class="container">
+      <h2>Features that feel polished</h2>
+      <p class="lead">Everything you need to ship a clean site fast.</p>
+      <div class="grid-3">
+        <div class="card feature">
+          <div class="icon">⚡</div>
+          <h3>Fast by default</h3>
+          <p>Minimal CSS, no heavy frameworks — just quick, responsive layout.</p>
+        </div>
+        <div class="card feature">
+          <div class="icon">🎨</div>
+          <h3>Modern design</h3>
+          <p>Consistent spacing, soft gradients, and accessible color contrast.</p>
+        </div>
+        <div class="card feature">
+          <div class="icon">🛠️</div>
+          <h3>Easy to edit</h3>
+          <p>Plain HTML & CSS. Change text and sections in seconds.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Showcase -->
+  <section id="showcase" class="section">
+    <div class="container">
+      <h2>Showcase your value</h2>
+      <p class="lead">Use panels to highlight product shots, stats, or testimonials.</p>
+      <div class="showcase">
+        <div class="panel">
+          <div class="head">
+            <div class="pill">Stats</div>
+            <div class="pill">Growth</div>
+          </div>
+          <div class="body">
+            <div class="grid-3">
+              <div class="card">
+                <div class="small">Users</div>
+                <div style="font-size:24px; font-weight:800;">12,400+</div>
+              </div>
+              <div class="card">
+                <div class="small">Load time</div>
+                <div style="font-size:24px; font-weight:800;">0.8s</div>
+              </div>
+              <div class="card">
+                <div class="small">Uptime</div>
+                <div style="font-size:24px; font-weight:800;">99.98%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="head">
+            <div class="pill">Testimonial</div>
+            <div class="pill">5★</div>
+          </div>
+          <div class="body">
+            <blockquote style="margin:0; font-size:18px; line-height:1.5;">
+              “Nova gave us a gorgeous site in a weekend. No build tools, just clean HTML.”
+            </blockquote>
+            <div class="small" style="margin-top:8px;">— A. Patel, Founder</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section id="pricing" class="section">
+    <div class="container">
+      <h2>Simple pricing</h2>
+      <p class="lead">Start free. Upgrade when you need more.</p>
+      <div class="pricing">
+        <div class="card price-card">
+          <div class="title">Starter</div>
+          <div class="price">₹0</div>
+          <div class="list">
+            <div class="item"><span class="tick">✔</span> One page</div>
+            <div class="item"><span class="tick">✔</span> Email support</div>
+            <div class="item"><span class="tick">✔</span> Basic styles</div>
+          </div>
+          <button class="btn">Choose Starter</button>
+        </div>
+        <div class="card price-card">
+          <div class="title">Pro</div>
+          <div class="price">₹999</div>
+          <div class="list">
+            <div class="item"><span class="tick">✔</span> Multi-section</div>
+            <div class="item"><span class="tick">✔</span> Custom blocks</div>
+            <div class="item"><span class="tick">✔</span> Priority support</div>
+          </div>
+          <button class="btn primary">Choose Pro</button>
+        </div>
+        <div class="card price-card">
+          <div class="title">Business</div>
+          <div class="price">₹2,999</div>
+          <div class="list">
+            <div class="item"><span class="tick">✔</span> Team collaboration</div>
+            <div class="item"><span class="tick">✔</span> Analytics panel</div>
+            <div class="item"><span class="tick">✔</span> Custom domains</div>
+          </div>
+          <button class="btn">Choose Business</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact" class="section">
+    <div class="container">
+      <h2>Contact us</h2>
+      <p class="lead">Questions or ideas? Send a message.</p>
+      <div class="contact-grid">
+        <div class="card">
+          <form id="contactForm">
+            <label for="name">Name</label>
+            <input id="name" name="name" placeholder="Your name" required />
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" placeholder="you@example.com" required />
+            <label for="message">Message</label>
+            <textarea id="message" name="message" rows="5" placeholder="Tell us what you need…" required></textarea>
+            <div style="display:flex; gap:10px; margin-top:12px;">
+              <button type="submit" class="btn primary">Send</button>
+              <button type="reset" class="btn">Reset</button>
+            </div>
+            <div id="formNote" class="small" style="margin-top:8px;"></div>
+          </form>
+        </div>
+        <div class="card">
+          <div class="small">Address</div>
+          <div style="margin:6px 0 14px;">Ahmedabad, Gujarat, India</div>
+          <div class="small">Email</div>
+          <div style="margin:6px 0 14px;">hello@nova.example</div>
+          <div class="small">Follow</div>
+          <div style="display:flex; gap:10px; margin-top:8px;">
+            <span class="pill">Twitter</span>
+            <span class="pill">GitHub</span>
+            <span class="pill">LinkedIn</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      © <span id="year"></span> Nova. All rights reserved.
+    </div>
+  </footer>
+
+  <script>
+    // Smooth hash navigation for all links
+    document.querySelectorAll('a[href^="#"]').forEach(a=>{
+      a.addEventListener('click', e=>{
+        const id=a.getAttribute('href').slice(1);
+        const el=document.getElementById(id);
+        if(el){ e.preventDefault(); el.scrollIntoView({behavior:'smooth'}); }
+      });
+    });
+
+    // Contact form demo (no backend) — just shows a message
+    const form=document.getElementById('contactForm');
+    const note=document.getElementById('formNote');
+    form.addEventListener('submit', e=>{
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(form));
+      note.textContent = `Thanks, ${data.name}! We’ll reply to ${data.email} soon.`;
+      form.reset();
+    });
+
+    // Year in footer
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

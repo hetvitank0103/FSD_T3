@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Game Hub</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    header {
+      background: #222;
+      padding: 20px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+    .game {
+      background: #333;
+      border-radius: 10px;
+      padding: 15px;
+    }
+    canvas {
+      background: #000;
+      display: block;
+      margin: 0 auto;
+    }
+    button {
+      margin: 5px;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #555;
+      color: #fff;
+    }
+    button:hover { background: #777; }
+  </style>
+</head>
+<body>
+  <header>🎮 Game Hub — Play All in One Page</header>
+  <div class="grid">
+    <!-- Tic Tac Toe -->
+    <div class="game">
+      <h2>Tic Tac Toe</h2>
+      <table id="board" style="margin:auto; border-collapse:collapse;">
+        <tr><td onclick="play(this)" style="width:60px;height:60px;border:1px solid #fff;text-align:center;font-size:24px;"></td><td onclick="play(this)" style="width:60px;height:60px;border:1px solid #fff;text-align:center;font-size:24px;"></td><td onclick="play(this)" style="width:60px;height:60px;border:1px solid #fff;text-align:center;font-size:24px;"></td></tr>
+        <tr><td onclick="play(this)" style="width:60px;height:60px;border:1px solid #fff;text-align:center;font-size:24px;"></td><td onclick="play(this)" style="width:60px;height:60px;border:1px solid #fff;text-align:center;font-size:24px;"></td><td onclick="play(this)" style="width:60px;height:60px;border:1px solid #fff;text-align:center;font-size:24px;"></td></tr>
+        <tr><td onclick="play(this)" style="width:60px;height:60px;border:1px solid #fff;text-align:center;font-size:24px;"></td><td onclick="play(this)" style="width:60px;height:60px;border:1px solid #fff;text-align:center;font-size:24px;"></td><td onclick="play(this)" style="width:60px;height:60px;border:1px solid #fff;text-align:center;font-size:24px;"></td></tr>
+      </table>
+      <p id="winner"></p>
+    </div>
+
+    <!-- Snake -->
+    <div class="game">
+      <h2>Snake</h2>
+      <canvas id="snakeCanvas" width="300" height="300"></canvas>
+      <p>Use arrow keys</p>
+    </div>
+
+    <!-- Rock Paper Scissors -->
+    <div class="game">
+      <h2>Rock Paper Scissors</h2>
+      <button onclick="rps('Rock')">Rock</button>
+      <button onclick="rps('Paper')">Paper</button>
+      <button onclick="rps('Scissors')">Scissors</button>
+      <p id="rpsResult"></p>
+    </div>
+
+    <!-- Memory Match -->
+    <div class="game">
+      <h2>Memory Match</h2>
+      <div id="memory"></div>
+    </div>
+  </div>
+
+  <script>
+    // Tic Tac Toe
+    let turn = "X";
+    function play(cell){
+      if(cell.innerHTML===""){
+        cell.innerHTML=turn;
+        turn = turn==="X"?"O":"X";
+        checkWinner();
+      }
+    }
+    function checkWinner(){
+      const cells = document.querySelectorAll("#board td");
+      const combos = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+      for(let combo of combos){
+        const [a,b,c] = combo;
+        if(cells[a].innerHTML && cells[a].innerHTML===cells[b].innerHTML && cells[a].innerHTML===cells[c].innerHTML){
+          document.getElementById("winner").innerText = cells[a].innerHTML+" wins!";
+        }
+      }
+    }
+
+    // Snake
+    const canvas = document.getElementById("snakeCanvas");
+    const ctx = canvas.getContext("2d");
+    let snake = [{x:150,y:150}];
+    let dx=10, dy=0;
+    let food = {x: 50, y: 50};
+    document.addEventListener("keydown", e=>{
+      if(e.key==="ArrowUp" && dy===0){dx=0;dy=-10;}
+      if(e.key==="ArrowDown" && dy===0){dx=0;dy=10;}
+      if(e.key==="ArrowLeft" && dx===0){dx=-10;dy=0;}
+      if(e.key==="ArrowRight" && dx===0){dx=10;dy=0;}
+    });
+    function drawSnake(){
+      ctx.fillStyle="lime";
+      snake.forEach(s=>ctx.fillRect(s.x,s.y,10,10));
+    }
+    function drawFood(){
+      ctx.fillStyle="red";
+      ctx.fillRect(food.x,food.y,10,10);
+    }
+    function moveSnake(){
+      const head={x:snake[0].x+dx,y:snake[0].y+dy};
+      snake.unshift(head);
+      if(head.x===food.x && head.y===food.y){
+        food={x:Math.floor(Math.random()*30)*10,y:Math.floor(Math.random()*30)*10};
+      } else {
+        snake.pop();
+      }
+    }
+    function gameLoop(){
+      ctx.clearRect(0,0,300,300);
+      moveSnake();
+      drawSnake();
+      drawFood();
+      if(snake[0].x<0||snake[0].x>=300||snake[0].y<0||snake[0].y>=300||snake.slice(1).some(s=>s.x===snake[0].x&&s.y===snake[0].y)){
+        alert("Game Over");
+        snake=[{x:150,y:150}]; dx=10; dy=0;
+      }
+    }
+    setInterval(gameLoop,100);
+
+    // Rock Paper Scissors
+    function rps(player){
+      const choices=["Rock","Paper","Scissors"];
+      const comp=choices[Math.floor(Math.random()*3)];
+      let result="";
+      if(player===comp) result="Draw!";
+      else if((player==="Rock"&&comp==="Scissors")||(player==="Paper"&&comp==="Rock")||(player==="Scissors"&&comp==="Paper")) result="You win!";
+      else result="Computer wins!";
+      document.getElementById("rpsResult").innerText=`You: ${player} | Computer: ${comp} → ${result}`;
+    }
+
+    // Memory Match
+    const memory=document.getElementById("memory");
+    const cards=["🍎","🍌","🍇","🍒","🍎","🍌","🍇","🍒"];
+    cards.sort(()=>Math.random()-0.5);
+    let first=null;
+    cards.forEach((c,i)=>{
+      const btn=document.createElement("button");
+      btn.textContent="?";
+      btn.style.width="50px"; btn.style.height="50px"; btn.style.fontSize="24px";
+      btn.onclick=()=>{
+        btn.textContent=c;
+        if(!first){first={btn,c};}
+        else{
+          if(first.c===c){first=null;}
+          else{
+            setTimeout(()=>{btn.textContent="?"; first.btn.textContent="?"; first=null;},800);
+          }
+        }
+      };
+      memory.appendChild(btn);
+    });
+  </script>
+</body>
+</html>

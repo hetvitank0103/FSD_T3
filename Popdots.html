@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pop the Dots</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --text: #e5e7eb;
+      --accent: #60a5fa;
+      --accent2: #34d399;
+      --danger: #f87171;
+      --dot: #fbbf24;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+      background: radial-gradient(1200px 600px at 70% -10%, #1f2937 0%, var(--bg) 55%);
+      color: var(--text);
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+    }
+    .container {
+      width: 100%;
+      max-width: 920px;
+      padding: 24px;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .title {
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    .controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    button, select {
+      background: #0b1220;
+      border: 1px solid #1f2937;
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+    }
+    button:hover, select:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+      border-color: #374151;
+    }
+    button.primary {
+      background: linear-gradient(135deg, #0ea5e9, #22d3ee);
+      color: #061423;
+      border: none;
+      font-weight: 700;
+    }
+    button.secondary {
+      background: linear-gradient(135deg, #10b981, #4ade80);
+      color: #062412;
+      border: none;
+      font-weight: 700;
+    }
+    button.danger {
+      background: linear-gradient(135deg, #ef4444, #f97316);
+      color: #2b0b0b;
+      border: none;
+      font-weight: 700;
+    }
+    .hud {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 12px 0 16px;
+    }
+    .card {
+      background: linear-gradient(180deg, #0b1220, #0a0f1a);
+      border: 1px solid #1f2937;
+      border-radius: 14px;
+      padding: 12px;
+      text-align: center;
+    }
+    .label { font-size: 12px; opacity: 0.75; }
+    .value { font-size: 20px; font-weight: 800; margin-top: 4px; letter-spacing: 0.4px; }
+    .arena-wrap {
+      position: relative;
+      background: #070b14;
+      border: 1px solid #1f2937;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: inset 0 0 0 1px #0c1424, 0 18px 50px rgba(0,0,0,0.35);
+    }
+    .arena {
+      position: relative;
+      width: 100%;
+      height: 520px;
+      background:
+        radial-gradient(1000px 300px at 10% -20%, rgba(96, 165, 250, 0.08), transparent 60%),
+        radial-gradient(900px 260px at 90% -10%, rgba(52, 211, 153, 0.08), transparent 60%),
+        radial-gradient(900px 260px at 50% 110%, rgba(251, 191, 36, 0.06), transparent 60%);
+    }
+    .dot {
+      position: absolute;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #fff3, transparent 40%), var(--dot);
+      box-shadow: 0 6px 22px rgba(251,191,36,0.35);
+      cursor: pointer;
+      user-select: none;
+      transition: transform 80ms ease;
+    }
+    .dot:hover { transform: scale(1.06); }
+    .dot.small { width: 26px; height: 26px; }
+    .dot.big { width: 44px; height: 44px; }
+    .message {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      pointer-events: none;
+    }
+    .message .bubble {
+      background: rgba(6, 12, 22, 0.85);
+      border: 1px solid #1f2937;
+      border-radius: 16px;
+      padding: 16px 20px;
+      text-align: center;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.45);
+    }
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .tip { opacity: 0.7; font-size: 12px; }
+    .progress {
+      position: relative;
+      width: 100%;
+      height: 8px;
+      background: #0b1322;
+      border: 1px solid #12233f;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .bar {
+      position: absolute;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #60a5fa, #34d399, #fbbf24);
+      transition: width 200ms linear;
+    }
+    @media (max-width: 720px) {
+      .hud { grid-template-columns: repeat(2, 1fr); }
+      .arena { height: 420px; }
+      .dot { width: 30px; height: 30px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="title">Pop the Dots</div>
+      <div class="controls">
+        <select id="difficulty">
+          <option value="easy">Easy</option>
+          <option value="normal" selected>Normal</option>
+          <option value="hard">Hard</option>
+          <option value="insane">Insane</option>
+        </select>
+        <button id="startBtn" class="primary">Start</button>
+        <button id="pauseBtn" class="secondary" disabled>Pause</button>
+        <button id="resetBtn" class="danger" disabled>Reset</button>
+      </div>
+    </div>
+
+    <div class="hud">
+      <div class="card">
+        <div class="label">Time</div>
+        <div class="value" id="time">30</div>
+      </div>
+      <div class="card">
+        <div class="label">Score</div>
+        <div class="value" id="score">0</div>
+      </div>
+      <div class="card">
+        <div class="label">Combo</div>
+        <div class="value" id="combo">x1</div>
+      </div>
+      <div class="card">
+        <div class="label">Best</div>
+        <div class="value" id="best">0</div>
+      </div>
+    </div>
+
+    <div class="arena-wrap">
+      <div id="arena" class="arena"></div>
+      <div class="message" id="overlay" style="display:none;">
+        <div class="bubble">
+          <div id="overlayTitle" style="font-weight:800; letter-spacing:0.4px;">Ready?</div>
+          <div id="overlayBody" style="opacity:0.8; margin-top:6px;">Click Start to play.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="tip">Tip: Pop dots fast to build combo and score multipliers. Missing clicks breaks the combo.</div>
+      <div class="progress"><div id="bar" class="bar"></div></div>
+    </div>
+  </div>
+
+  <script>
+    const arena = document.getElementById('arena');
+    const timeEl = document.getElementById('time');
+    const scoreEl = document.getElementById('score');
+    const comboEl = document.getElementById('combo');
+    const bestEl = document.getElementById('best');
+    const overlay = document.getElementById('overlay');
+    const overlayTitle = document.getElementById('overlayTitle');
+    const overlayBody = document.getElementById('overlayBody');
+    const bar = document.getElementById('bar');
+
+    const startBtn = document.getElementById('startBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const difficultySel = document.getElementById('difficulty');
+
+    let game = null;
+
+    const DIFF = {
+      easy:   { spawn: 900, speed: 2300, size: 'big',   time: 35, points: 10 },
+      normal: { spawn: 700, speed: 2000, size: 'normal', time: 30, points: 12 },
+      hard:   { spawn: 500, speed: 1600, size: 'small', time: 28, points: 14 },
+      insane: { spawn: 360, speed: 1200, size: 'small', time: 25, points: 18 },
+    };
+
+    const rand = (min, max) => Math.random() * (max - min) + min;
+
+    function newDot(d) {
+      const dot = document.createElement('div');
+      dot.className = 'dot ' + (d.size === 'big' ? 'big' : d.size === 'small' ? 'small' : '');
+      const arenaRect = arena.getBoundingClientRect();
+      const maxX = arenaRect.width - dotSize(dot);
+      const maxY = arenaRect.height - dotSize(dot);
+      const x = rand(0, maxX);
+      const y = rand(0, maxY);
+      dot.style.left = x + 'px';
+      dot.style.top = y + 'px';
+
+      // Animate: drift to a new random position, then remove
+      const driftX = rand(-80, 80);
+      const driftY = rand(-60, 60);
+      dot.animate(
+        [{ transform: 'translate(0,0)' }, { transform: `translate(${driftX}px, ${driftY}px)` }],
+        { duration: d.speed, easing: 'ease-out' }
+      );
+
+      const ttl = setTimeout(() => {
+        if (dot.isConnected) dot.remove();
+      }, d.speed);
+
+      dot.addEventListener('pointerdown', (e) => {
+        e.stopPropagation();
+        clearTimeout(ttl);
+        popDot(dot, d);
+      });
+
+      arena.appendChild(dot);
+    }
+
+    function dotSize(dot) {
+      const styles = getComputedStyle(dot);
+      return parseFloat(styles.width);
+    }
+
+    function popDot(dot, d) {
+      // Score + combo logic
+      game.combo = Math.min(game.combo + 1, 8);
+      const mult = 1 + (game.combo - 1) * 0.15;
+      const gained = Math.round(d.points * mult);
+      game.score += gained;
+      scoreEl.textContent = game.score;
+      comboEl.textContent = 'x' + game.combo;
+
+      // Pop animation
+      dot.animate(
+        [{ transform: 'scale(1)' }, { transform: 'scale(0.1)', opacity: 0 }],
+        { duration: 120, easing: 'ease-in' }
+      ).onfinish = () => dot.remove();
+    }
+
+    function miss() {
+      // Clicking empty space resets combo
+      game.combo = 1;
+      comboEl.textContent = 'x' + game.combo;
+    }
+
+    function startGame() {
+      if (game && game.running) return;
+      const d = DIFF[difficultySel.value];
+      game = {
+        running: true,
+        paused: false,
+        time: d.time,
+        score: 0,
+        combo: 1,
+        timers: { spawn: null, tick: null }
+      };
+      scoreEl.textContent = 0;
+      comboEl.textContent = 'x1';
+      timeEl.textContent = d.time;
+      overlay.style.display = 'none';
+      arena.innerHTML = '';
+
+      startBtn.disabled = true;
+      pauseBtn.disabled = false;
+      resetBtn.disabled = false;
+      difficultySel.disabled = true;
+
+      // Progress bar
+      bar.style.width = '0%';
+
+      // Spawn loop
+      game.timers.spawn = setInterval(() => {
+        if (!game.running || game.paused) return;
+        newDot(d);
+      }, d.spawn);
+
+      // Timer loop
+      const total = d.time;
+      game.timers.tick = setInterval(() => {
+        if (!game.running || game.paused) return;
+        game.time--;
+        timeEl.textContent = game.time;
+        const used = total - game.time;
+        bar.style.width = Math.min(100, (used / total) * 100) + '%';
+        if (game.time <= 0) endGame();
+      }, 1000);
+    }
+
+    function endGame() {
+      if (!game) return;
+      game.running = false;
+      clearInterval(game.timers.spawn);
+      clearInterval(game.timers.tick);
+
+      // Clean dots
+      [...arena.querySelectorAll('.dot')].forEach(d => d.remove());
+
+      // Best score
+      const best = parseInt(localStorage.getItem('pop_best') || '0', 10);
+      const newBest = Math.max(best, game.score);
+      localStorage.setItem('pop_best', String(newBest));
+      bestEl.textContent = newBest;
+
+      overlayTitle.textContent = 'Time up!';
+      overlayBody.textContent = `Your score: ${game.score}`;
+      overlay.style.display = 'grid';
+
+      startBtn.disabled = false;
+      pauseBtn.disabled = true;
+      resetBtn.disabled = false;
+      difficultySel.disabled = false;
+    }
+
+    function pauseGame() {
+      if (!game || !game.running) return;
+      game.paused = !game.paused;
+      overlay.style.display = game.paused ? 'grid' : 'none';
+      overlayTitle.textContent = game.paused ? 'Paused' : '';
+      overlayBody.textContent = game.paused ? 'Click Pause again to resume.' : '';
+      pauseBtn.textContent = game.paused ? 'Resume' : 'Pause';
+    }
+
+    function resetGame() {
+      // Stop loops
+      if (game) {
+        clearInterval(game.timers.spawn);
+        clearInterval(game.timers.tick);
+      }
+      game = null;
+      scoreEl.textContent = '0';
+      timeEl.textContent = DIFF[difficultySel.value].time;
+      comboEl.textContent = 'x1';
+      bestEl.textContent = localStorage.getItem('pop_best') || '0';
+      arena.innerHTML = '';
+      bar.style.width = '0%';
+
+      startBtn.disabled = false;
+      pauseBtn.disabled = true;
+      resetBtn.disabled = true;
+      difficultySel.disabled = false;
+
+      overlayTitle.textContent = 'Ready?';
+      overlayBody.textContent = 'Click Start to play.';
+      overlay.style.display = 'grid';
+    }
+
+    // Click empty arena -> miss
+    arena.addEventListener('pointerdown', (e) => {
+      if (!game || !game.running || game.paused) return;
+      // Ignore if clicked a dot
+      if (e.target.classList.contains('dot')) return;
+      miss();
+    });
+
+    // Controls
+    startBtn.addEventListener('click', startGame);
+    pauseBtn.addEventListener('click', pauseGame);
+    resetBtn.addEventListener('click', resetGame);
+
+    // Init
+    (function init() {
+      bestEl.textContent = localStorage.getItem('pop_best') || '0';
+      overlay.style.display = 'grid';
+    })();
+  </script>
+</body>
+</html>
